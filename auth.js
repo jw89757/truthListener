@@ -1,6 +1,8 @@
 // auth.js
 
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+puppeteer.use(StealthPlugin());
 import { loadJson, saveJson } from './utils.js';
 import {
   COOKIE_PATH,
@@ -15,8 +17,13 @@ import readline from 'readline';
  * After you confirm in the terminal, it saves cookies and returns { browser, page }.
  */
 export async function getAuthenticatedBrowser() {
-  // 1) Launch Puppeteer (headful)
-  const browser = await puppeteer.launch(PUPPETEER_OPTIONS);
+  // 1) Launch Puppeteer (headful) with real Chrome profile
+  const browser = await puppeteer.launch({
+    headless: false,
+    userDataDir: '/Users/jinwu/Library/Application Support/Google/Chrome/Default',
+    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', // optional, but ensures real Chrome is used
+    ...PUPPETEER_OPTIONS
+  });
   const page = await browser.newPage();
 
   // 2) Try to reuse cookies if they already exist
